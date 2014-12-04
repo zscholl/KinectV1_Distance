@@ -6,4 +6,7 @@ Requires Kinect V1.8 SDK and a Kinect 1 device.
 
 TODO:
   - Support for Kinect 2
-  - Display cue for color images mappable region (contents of color image which correspond to depth data)
+
+
+Known Bugs
+  - Toggle valid color pixels button does not work
