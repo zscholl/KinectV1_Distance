@@ -1,0 +1,14 @@
+﻿<Window x:Class="ColorToDepth_KinectV1._8.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Picking Distance" Height="800" Width="1000" Loaded="WindowLoaded" Closing="WindowClosing">
+    <Grid>
+        
+        <Image MouseLeftButtonDown="color_MouseLeftButtonDown" Name="camera" Width="640" Height="480"  HorizontalAlignment="Left" VerticalAlignment="Top" />
+        
+        <Image MouseLeftButtonDown="depth_MouseLeftButtonDown" Name="depth" Width="320" Height="240"  VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+        <Canvas Name="colorCanvas" Width="640" Height="480" HorizontalAlignment="Left" VerticalAlignment="Top" ></Canvas>
+        <Canvas Name="depthCanvas" Width="320" Height="240" VerticalAlignment="Bottom" HorizontalAlignment="Left" ></Canvas>
+        <TextBlock Name="textblock" TextWrapping="Wrap" Margin="788,10,10,596" Text="Distance:"><TextBlock Name="distanceData" TextWrapping="Wrap" Text="feet" MouseLeftButtonDown="TextBlock_LeftMouseDown"></TextBlock></TextBlock>
+    </Grid>
+</Window>
