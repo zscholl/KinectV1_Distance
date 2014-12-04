@@ -32,6 +32,7 @@ namespace ColorToDepth_KinectV1._8
         /// </summary>
         private KinectSensor sensor;
 
+        private int showValidColorPixels = 0;
         /// <summary>
         /// Bitmap that will hold color information
         /// </summary>
@@ -181,16 +182,26 @@ namespace ColorToDepth_KinectV1._8
                     // Copy the pixel data from the image to a temporary array
                     colorFrame.CopyPixelDataTo(this.colorPixels);
 
+                    //Changes alpha value to 0 if the pixel does not have a known depth
+                    if (showValidColorPixels == 0)
+                    {
+                        for (int i = 0; i < (colorPixels.Length) / 4; i++)
+                        {
+                            if (depthPoints.ElementAt(i).Depth == 0)
+                            {
+                                colorPixels[i * 4] = 0;
+                            }
+                        }
+                    }
 
-                    // Write the color pixel data into our bitmap
-                    
-                    this.colorBitmap.WritePixels(
-                        new Int32Rect(0, 0, this.colorBitmap.PixelWidth, this.colorBitmap.PixelHeight),
-                        this.colorPixels,
-                        this.colorBitmap.PixelWidth * sizeof(int),
-                        0);
+                        // Write the color pixel data into our bitmap
 
-                 
+                        this.colorBitmap.WritePixels(
+                            new Int32Rect(0, 0, this.colorBitmap.PixelWidth, this.colorBitmap.PixelHeight),
+                            this.colorPixels,
+                            this.colorBitmap.PixelWidth * sizeof(int),
+                            0);
+
                 }
             }
 
@@ -211,8 +222,8 @@ namespace ColorToDepth_KinectV1._8
                     this.sensor.CoordinateMapper.MapDepthFrameToColorFrame(depthFormat, this.depthPixels, colorFormat, this.colorCoordinates);
 
 
-                   
-                   
+
+
                     // Write the color pixel data into our bitmap
                     this.depthBitmap.WritePixels(
                         new Int32Rect(0, 0, this.depthWidth, this.depthHeight),
@@ -233,31 +244,35 @@ namespace ColorToDepth_KinectV1._8
 
 
 
-                       }
                 }
-
-
             }
+
+
+        }
 
         private void TextBlock_LeftMouseDown(Object sender, MouseEventArgs e)
         {
             var block = sender as TextBlock;
-                if (block != null){
-                    block.Text =  " millimeters";
-                 }
+            if (block != null)
+            {
+                block.Text = " millimeters";
+            }
         }
 
         private void depth_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-           
+
             if (sender != null)
             {
                 System.Windows.Point point = e.GetPosition(depth);
-                
-                DepthImagePixel dpix = depthPixels.ElementAt((int)(point.X + (point.Y)*this.depthWidth));
+
+                ColorImagePoint cpoint = colorCoordinates.ElementAt((int)(point.X + (point.Y) * this.depthWidth));
+
+                DepthImagePixel dpix = depthPixels.ElementAt((int)(point.X + (point.Y) * this.depthWidth));
                 if (dpix.IsKnownDepth)
                 {
-                    distanceData.Text = " The depth is " + ((double)(dpix.Depth) / 1000) + " meters";
+                    distanceData.Text = " " + ((double)(dpix.Depth) / 1000) + " meters";
+                    coordinatesText.Text = "x: " + cpoint.X + " y: " + cpoint.Y;
                 }
                 else
                     distanceData.Text = " unkown depth";
@@ -274,17 +289,19 @@ namespace ColorToDepth_KinectV1._8
         }
         private void color_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            
-            
+
+
             if (sender != null)
             {
                 System.Windows.Point point = e.GetPosition(camera);
                 DepthImagePoint dpoint = this.depthPoints.ElementAt((int)((point.X) + (point.Y) * this.sensor.ColorStream.FrameWidth));
                 if (dpoint.Depth > 0)
                 {
-                    distanceData.Text = " color works " + ((double)(dpoint.Depth) / 1000) + " meters";
+                    distanceData.Text = " " + ((double)(dpoint.Depth) / 1000) + " meters";
                 }
                 else distanceData.Text = " Unknown Depth";
+
+                colorPixelCoordinates.Text = "x: " + point.X + "y: " + point.Y;
                 Ellipse ellipse = new Ellipse();
                 ellipse.Width = 5;
                 ellipse.Height = 5;
@@ -296,5 +313,13 @@ namespace ColorToDepth_KinectV1._8
 
             }
         }
+        private void color_toggle_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender != null)
+            {
+                showValidColorPixels++;
+                showValidColorPixels = showValidColorPixels % 2;
+            }
         }
     }
+}
